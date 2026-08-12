@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Backend-Uc12-FiadoFacil")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3fdaad5e60b6ffdff32e0c9768ac8ed066405a17")]
 [assembly: System.Reflection.AssemblyProductAttribute("Backend-Uc12-FiadoFacil")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Backend-Uc12-FiadoFacil")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
