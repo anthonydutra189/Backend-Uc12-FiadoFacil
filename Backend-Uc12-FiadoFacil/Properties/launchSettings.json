@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Backend-Uc12-FiadoFacil": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
