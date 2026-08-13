@@ -1,6 +1,6 @@
 ﻿using MySqlConnector;
 
-using var connection = new MySqlConnection(configuracaoBD.connectionString);
+using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
 connection.Open();
 
 using var command = new MySqlCommand("SELECT * FROM testes;", connection);
