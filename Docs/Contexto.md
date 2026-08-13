@@ -189,3 +189,6 @@ model User{
 }
 
 ## REGRAS
+
+ - User
+    - hieraquia 
