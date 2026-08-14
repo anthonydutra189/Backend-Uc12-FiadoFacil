@@ -2,9 +2,49 @@
 
 O Fiado Fácil é um sistema que permite que os comerciantes cadastrem seus clientes e registrem os fiados deles. O sistema permite que os comerciantes cadastrem seus clientes e registrem os fiados deles.
 
+## Integrantes do grupo
+- Antony
+- Milena
+- Wanderson
+- Felipe
+
+### Divisão de tarefas
+Classes que cada um tem que criar e fazer funcionar:
+- `User`: Felipe
+- `Company`: Wanderson
+- `Product`: Milena
+- `Payment`: Antony
+  - `_product_payment`
+
+## CRUD
+Operações do CRUD (inserir, ler, atualizar, deletar) para cada tela:
+- `User`: inserir, ler, atualizar, deletar
+  - O deletar deve ser em formato de cascata (deletar todas as informações atreladas a ele)
+- `Company`: inserir, ler, atualizar
+  - Não tem delete
+- `Product`: inserir, ler, atualizar, deletar
+  - Deletar em cascata
+- `Payment`: inserir, ler, deletar
+  - Não tem atualizar
+  - `_product_payment`: inserir, ler
+
+## Banco de dados
+
+- **users**: usuários do sistema
+	- **Customer:** dono do estabelecimento
+	- **Admin:** dono do sistema
+	- **Client:** cliente que está devendo para o Customer (dono do estabelecimento)
+- **companies**: empresa do usuário que usa o sistema
+	- Chave estrangeira com `user`
+- **products**: produtos que pertencem a uma empresa
+	- Chave estrangeira com `companies`
+- **payments**: pagamentos do usuário para com a empresa
+	- Chave estrangeira do `user` do tipo *Client*
+	- Chave estrangeira com `companies`
+- **_produto_payment**: tabela somente de chaves estrangeiras que liga o produto e o pagamento
 
 
-## TABELAS
+### Schema
 
 - Usuários
     
