@@ -231,4 +231,4 @@ model User{
 ## REGRAS
 
  - User
-    - hieraquia 
+    - hieraquia..
