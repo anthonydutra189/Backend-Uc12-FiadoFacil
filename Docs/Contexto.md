@@ -2,6 +2,7 @@
 
 O Fiado Fácil é um sistema que permite que os comerciantes cadastrem seus clientes e registrem os fiados deles. O sistema permite que os comerciantes cadastrem seus clientes e registrem os fiados deles.
 
+<<<<<<< Updated upstream
 ## Integrantes do grupo
 - Antony
 - Milena
@@ -122,6 +123,8 @@ Operações do CRUD (inserir, ler, atualizar, deletar) para cada tela:
         ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     
 
+=======
+>>>>>>> Stashed changes
 ### SCHEMA PRISMA
 
 me de o sql para criar as tabelas no mySQL deste schema aqui:
@@ -228,3 +231,22 @@ model User{
   @@map("users") 
 }
 
+<<<<<<< Updated upstream
+=======
+## REGRAS
+
+ - User
+    - hierarquia: admin
+        - Admin 
+            -  Company: 
+            -  Product:
+            -  Payment:
+            -  User: Pode criar todos os tipo de usuários: Admin, Comerciante e cliente 
+                - somente o admin pode criar outros u
+        
+        -  Comerciante 
+            - Company:
+            - Product:
+            - Payment:
+
+>>>>>>> Stashed changes
