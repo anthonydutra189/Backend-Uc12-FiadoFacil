@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Backend_Uc12_FiadoFacil.Models;
-using Backend_Uc12_FiadoFacil.Repositories;
+using System.Threading.Tasks;
 
 namespace Backend_Uc12_FiadoFacil
 {
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             while (true)
             {
@@ -26,19 +25,19 @@ namespace Backend_Uc12_FiadoFacil
                 switch (opcao)
                 {
                     case "1":
-                        MenuUsuarios();
+                        await MenuUsuarios();
                         break;
                     case "2":
-                        MenuEmpresas();
+                        await MenuEmpresas();
                         break;
                     case "3":
-                        MenuProdutos();
+                        await MenuProdutos();
                         break;
                     case "4":
-                        MenuPagamentos();
+                        await MenuPagamentos();
                         break;
                     case "5":
-                        MenuProdutoPagamentos();
+                        await MenuProdutoPagamentos();
                         break;
                     case "0":
                         Console.WriteLine("Saindo...");
@@ -52,9 +51,8 @@ namespace Backend_Uc12_FiadoFacil
         }
 
         // ======================= ROTAS DE USUÁRIOS =======================
-        static void MenuUsuarios()
+        static async Task MenuUsuarios()
         {
-            var repo = new UserRepository();
             while (true)
             {
                 Console.Clear();
@@ -75,11 +73,11 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("Tipo (Customer/Admin/Client): "); u.Type = Console.ReadLine() ?? "";
                         Console.Write("Email: "); u.Email = Console.ReadLine() ?? "";
                         Console.Write("Senha: "); u.Senha = Console.ReadLine() ?? "";
-                        repo.Insert(u);
+                        await u.InserirAsync();
                         Console.WriteLine($"Usuário cadastrado com ID {u.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
-                        var users = repo.GetAll();
+                        var users = await User.BuscarTodosAsync();
                         foreach (var user in users)
                             Console.WriteLine($"ID: {user.Id} | Nome: {user.Name} | Tipo: {user.Type} | Email: {user.Email}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
@@ -88,14 +86,14 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("ID do usuário a atualizar: ");
                         if (int.TryParse(Console.ReadLine(), out int uid))
                         {
-                            var up = repo.GetById(uid);
+                            var up = await User.BuscarPorIdAsync(uid);
                             if (up != null)
                             {
                                 Console.Write($"Nome ({up.Name}): "); var n = Console.ReadLine(); if (!string.IsNullOrEmpty(n)) up.Name = n;
                                 Console.Write($"Tipo ({up.Type}): "); var t = Console.ReadLine(); if (!string.IsNullOrEmpty(t)) up.Type = t;
                                 Console.Write($"Email ({up.Email}): "); var e = Console.ReadLine(); if (!string.IsNullOrEmpty(e)) up.Email = e;
                                 Console.Write($"Senha ({up.Senha}): "); var s = Console.ReadLine(); if (!string.IsNullOrEmpty(s)) up.Senha = s;
-                                repo.Update(up);
+                                await up.AtualizarAsync();
                                 Console.WriteLine("Atualizado com sucesso. Pressione algo...");
                             }
                             else Console.WriteLine("Não encontrado.");
@@ -106,7 +104,7 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("ID do usuário a deletar: ");
                         if (int.TryParse(Console.ReadLine(), out int did))
                         {
-                            repo.Delete(did);
+                            await User.DeletarAsync(did);
                             Console.WriteLine("Deletado com sucesso. Pressione algo...");
                         }
                         Console.ReadKey();
@@ -118,9 +116,8 @@ namespace Backend_Uc12_FiadoFacil
         }
 
         // ======================= ROTAS DE EMPRESAS =======================
-        static void MenuEmpresas()
+        static async Task MenuEmpresas()
         {
-            var repo = new CompanyRepository();
             while (true)
             {
                 Console.Clear();
@@ -144,11 +141,11 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("Endereço: "); c.Addrres = Console.ReadLine() ?? "";
                         Console.Write("Telefone: "); c.Phone = Console.ReadLine() ?? "";
                         Console.Write("ID do Usuário Dono: "); if (int.TryParse(Console.ReadLine(), out int uid)) c.UserId = uid;
-                        repo.Insert(c);
+                        await c.InserirAsync();
                         Console.WriteLine($"Empresa cadastrada com ID {c.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
-                        var comps = repo.GetAll();
+                        var comps = await Company.BuscarTodosAsync();
                         foreach (var comp in comps)
                             Console.WriteLine($"ID: {comp.Id} | Nome: {comp.Name} | DonoID: {comp.UserId}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
@@ -157,12 +154,12 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("ID da empresa a atualizar: ");
                         if (int.TryParse(Console.ReadLine(), out int cid))
                         {
-                            var up = repo.GetById(cid);
+                            var up = await Company.BuscarPorIdAsync(cid);
                             if (up != null)
                             {
                                 Console.Write($"Nome ({up.Name}): "); var n = Console.ReadLine(); if (!string.IsNullOrEmpty(n)) up.Name = n;
                                 Console.Write($"Telefone ({up.Phone}): "); var tel = Console.ReadLine(); if (!string.IsNullOrEmpty(tel)) up.Phone = tel;
-                                repo.Update(up);
+                                await up.AtualizarAsync();
                                 Console.WriteLine("Atualizado com sucesso. Pressione algo...");
                             }
                             else Console.WriteLine("Não encontrado.");
@@ -176,9 +173,8 @@ namespace Backend_Uc12_FiadoFacil
         }
 
         // ======================= ROTAS DE PRODUTOS =======================
-        static void MenuProdutos()
+        static async Task MenuProdutos()
         {
-            var repo = new ProductRepository();
             while (true)
             {
                 Console.Clear();
@@ -201,11 +197,11 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("Descrição: "); p.Description = Console.ReadLine() ?? "";
                         Console.Write("URL Img: "); p.UrlImg = Console.ReadLine() ?? "";
                         Console.Write("ID Empresa: "); if (int.TryParse(Console.ReadLine(), out int cid)) p.CompanyId = cid;
-                        repo.Insert(p);
+                        await p.InserirAsync();
                         Console.WriteLine($"Produto cadastrado ID {p.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
-                        var prods = repo.GetAll();
+                        var prods = await Product.BuscarTodosAsync();
                         foreach (var prod in prods)
                             Console.WriteLine($"ID: {prod.Id} | Nome: {prod.Name} | Valor: {prod.Value} | EmpresaID: {prod.CompanyId}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
@@ -214,12 +210,12 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("ID do produto a atualizar: ");
                         if (int.TryParse(Console.ReadLine(), out int pid))
                         {
-                            var up = repo.GetById(pid);
+                            var up = await Product.BuscarPorIdAsync(pid);
                             if (up != null)
                             {
                                 Console.Write($"Nome ({up.Name}): "); var n = Console.ReadLine(); if (!string.IsNullOrEmpty(n)) up.Name = n;
                                 Console.Write($"Valor ({up.Value}): "); var val = Console.ReadLine(); if (double.TryParse(val, out double nv)) up.Value = nv;
-                                repo.Update(up);
+                                await up.AtualizarAsync();
                                 Console.WriteLine("Atualizado. Pressione algo...");
                             }
                         }
@@ -227,7 +223,7 @@ namespace Backend_Uc12_FiadoFacil
                         break;
                     case "4":
                         Console.Write("ID do produto a deletar: ");
-                        if (int.TryParse(Console.ReadLine(), out int did)) repo.Delete(did);
+                        if (int.TryParse(Console.ReadLine(), out int did)) await Product.DeletarAsync(did);
                         Console.WriteLine("Feito. Pressione algo..."); Console.ReadKey();
                         break;
                     case "0": return;
@@ -237,9 +233,8 @@ namespace Backend_Uc12_FiadoFacil
         }
 
         // ======================= ROTAS DE PAGAMENTOS =======================
-        static void MenuPagamentos()
+        static async Task MenuPagamentos()
         {
-            var repo = new PaymentRepository();
             while (true)
             {
                 Console.Clear();
@@ -261,18 +256,18 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("DueDate (dd/mm/aaaa): "); if (DateTime.TryParse(Console.ReadLine(), out DateTime dd)) p.DueDate = dd;
                         Console.Write("ID Usuário: "); if (int.TryParse(Console.ReadLine(), out int uid)) p.UserId = uid;
                         Console.Write("ID Empresa: "); if (int.TryParse(Console.ReadLine(), out int cid)) p.CompanyId = cid;
-                        repo.Insert(p);
+                        await p.InserirAsync();
                         Console.WriteLine($"Cadastrado ID {p.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
-                        var pays = repo.GetAll();
+                        var pays = await Payment.BuscarTodosAsync();
                         foreach (var pay in pays)
                             Console.WriteLine($"ID: {pay.Id} | Valor: {pay.Value} | Método: {pay.Method}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
                         break;
                     case "3":
                         Console.Write("ID do pagamento a deletar: ");
-                        if (int.TryParse(Console.ReadLine(), out int did)) repo.Delete(did);
+                        if (int.TryParse(Console.ReadLine(), out int did)) await Payment.DeletarAsync(did);
                         Console.WriteLine("Feito. Pressione algo..."); Console.ReadKey();
                         break;
                     case "0": return;
@@ -282,9 +277,8 @@ namespace Backend_Uc12_FiadoFacil
         }
 
         // ======================= ROTAS PRODUTO x PAGAMENTO =======================
-        static void MenuProdutoPagamentos()
+        static async Task MenuProdutoPagamentos()
         {
-            var repo = new ProductPaymentRepository();
             while (true)
             {
                 Console.Clear();
@@ -300,12 +294,12 @@ namespace Backend_Uc12_FiadoFacil
                     case "1":
                         Console.Write("ID Pagamento: "); int payId; int.TryParse(Console.ReadLine(), out payId);
                         Console.Write("ID Produto: "); int prodId; int.TryParse(Console.ReadLine(), out prodId);
-                        repo.Insert(prodId, payId);
+                        await ProductPayment.InserirAsync(prodId, payId);
                         Console.WriteLine("Vinculado! Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
                         Console.Write("ID Pagamento: "); int pId; int.TryParse(Console.ReadLine(), out pId);
-                        var ids = repo.GetProductIdsByPaymentId(pId);
+                        var ids = await ProductPayment.BuscarProdutosPorPagamentoAsync(pId);
                         Console.WriteLine($"Produtos vinculados ao pagamento {pId}: " + string.Join(", ", ids));
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
                         break;
