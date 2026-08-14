@@ -228,7 +228,3 @@ model User{
   @@map("users") 
 }
 
-## REGRAS
-
- - User
-    - hieraquia..
