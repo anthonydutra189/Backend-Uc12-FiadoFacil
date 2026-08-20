@@ -12,10 +12,10 @@ namespace Backend_Uc12_FiadoFacil
         public string Category { get; set; } = string.Empty;
         public string Cnpj { get; set; } = string.Empty;
         public string Places { get; set; } = string.Empty;
-        public string ZipCode { get; set; } = string.Empty;
+        public string zip_code { get; set; } = string.Empty;
         public string Addrres { get; set; } = string.Empty;
         public string Phone { get; set; } = string.Empty;
-        public int UserId { get; set; }
+        public User User { get; set; }
 
         public const string Tabela = "companies";
 
@@ -25,16 +25,21 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"INSERT INTO {Tabela} (name, category, cnpj, places, zipCode, addrres, phone, userId) VALUES (@name, @category, @cnpj, @places, @zipCode, @addrres, @phone, @userId)";
+            string query = $@"
+                INSERT INTO {Tabela} 
+                (name, category, cnpj, places, zip_code, addrres, phone, user_id) 
+                VALUES 
+                (@name, @category, @cnpj, @places, @zipCode, @addrres, @phone, @userId)";
+            
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@name", Name);
             command.Parameters.AddWithValue("@category", Category);
             command.Parameters.AddWithValue("@cnpj", Cnpj);
             command.Parameters.AddWithValue("@places", Places);
-            command.Parameters.AddWithValue("@zipCode", ZipCode);
+            command.Parameters.AddWithValue("@zipCode", zip_code);
             command.Parameters.AddWithValue("@addrres", Addrres);
             command.Parameters.AddWithValue("@phone", Phone);
-            command.Parameters.AddWithValue("@userId", UserId);
+            command.Parameters.AddWithValue("@userId", User?.Id);
             await command.ExecuteNonQueryAsync();
             Id = (int)command.LastInsertedId;
         }
@@ -44,7 +49,10 @@ namespace Backend_Uc12_FiadoFacil
             var companies = new List<Company>();
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"SELECT id, name, category, cnpj, places, zipCode, addrres, phone, userId FROM {Tabela}";
+            string query = $@"
+                SELECT c.*, u.name AS user_name, u.email AS user_email 
+                FROM {Tabela} c
+                INNER JOIN users u ON c.user_id = u.id";
             using var command = new MySqlCommand(query, connection);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -56,10 +64,15 @@ namespace Backend_Uc12_FiadoFacil
                     Category = reader.GetString("category"),
                     Cnpj = reader.GetString("cnpj"),
                     Places = reader.GetString("places"),
-                    ZipCode = reader.GetString("zipCode"),
+                    zip_code = reader.GetString("zip_code"),
                     Addrres = reader.GetString("addrres"),
                     Phone = reader.GetString("phone"),
-                    UserId = reader.GetInt32("userId")
+                    User = new User 
+                    { 
+                        Id = reader.GetInt32("user_id"), 
+                        Name = reader.GetString("user_name"),
+                        Email = reader.GetString("user_email")
+                    }
                 });
             }
             return companies;
@@ -69,7 +82,11 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"SELECT id, name, category, cnpj, places, zipCode, addrres, phone, userId FROM {Tabela} WHERE id = @id";
+            string query = $@"
+                SELECT c.*, u.name AS user_name, u.email AS user_email 
+                FROM {Tabela} c
+                INNER JOIN users u ON c.user_id = u.id 
+                WHERE c.id = @id";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@id", id);
             using var reader = await command.ExecuteReaderAsync();
@@ -82,10 +99,15 @@ namespace Backend_Uc12_FiadoFacil
                     Category = reader.GetString("category"),
                     Cnpj = reader.GetString("cnpj"),
                     Places = reader.GetString("places"),
-                    ZipCode = reader.GetString("zipCode"),
+                    zip_code = reader.GetString("zip_code"),
                     Addrres = reader.GetString("addrres"),
                     Phone = reader.GetString("phone"),
-                    UserId = reader.GetInt32("userId")
+                    User = new User 
+                    { 
+                        Id = reader.GetInt32("user_id"), 
+                        Name = reader.GetString("user_name"),
+                        Email = reader.GetString("user_email")
+                    }
                 };
             }
             return null;
@@ -95,16 +117,16 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"UPDATE {Tabela} SET name = @name, category = @category, cnpj = @cnpj, places = @places, zipCode = @zipCode, addrres = @addrres, phone = @phone, userId = @userId WHERE id = @id";
+            string query = $"UPDATE {Tabela} SET name = @name, category = @category, cnpj = @cnpj, places = @places, zip_code = @zipCode, addrres = @addrres, phone = @phone, user_id = @userId WHERE id = @id";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@name", Name);
             command.Parameters.AddWithValue("@category", Category);
             command.Parameters.AddWithValue("@cnpj", Cnpj);
             command.Parameters.AddWithValue("@places", Places);
-            command.Parameters.AddWithValue("@zipCode", ZipCode);
+            command.Parameters.AddWithValue("@zipCode", zip_code);
             command.Parameters.AddWithValue("@addrres", Addrres);
             command.Parameters.AddWithValue("@phone", Phone);
-            command.Parameters.AddWithValue("@userId", UserId);
+            command.Parameters.AddWithValue("@userId", User?.Id);
             command.Parameters.AddWithValue("@id", Id);
             await command.ExecuteNonQueryAsync();
         }

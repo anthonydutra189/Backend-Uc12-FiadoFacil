@@ -137,17 +137,19 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("Categoria: "); c.Category = Console.ReadLine() ?? "";
                         Console.Write("CNPJ: "); c.Cnpj = Console.ReadLine() ?? "";
                         Console.Write("Places: "); c.Places = Console.ReadLine() ?? "";
-                        Console.Write("ZipCode: "); c.ZipCode = Console.ReadLine() ?? "";
+                        Console.Write("ZipCode: "); c.zip_code = Console.ReadLine() ?? "";
                         Console.Write("Endereço: "); c.Addrres = Console.ReadLine() ?? "";
                         Console.Write("Telefone: "); c.Phone = Console.ReadLine() ?? "";
-                        Console.Write("ID do Usuário Dono: "); if (int.TryParse(Console.ReadLine(), out int uid)) c.UserId = uid;
+                        Console.Write("ID do Usuário Dono: "); 
+                        if (int.TryParse(Console.ReadLine(), out int uid)) 
+                            c.User = new User { Id = uid };
                         await c.InserirAsync();
                         Console.WriteLine($"Empresa cadastrada com ID {c.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
                         var comps = await Company.BuscarTodosAsync();
                         foreach (var comp in comps)
-                            Console.WriteLine($"ID: {comp.Id} | Nome: {comp.Name} | DonoID: {comp.UserId}");
+                            Console.WriteLine($"ID: {comp.Id} | Nome: {comp.Name} | Dono: {comp.User?.Name}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
                         break;
                     case "3":
@@ -196,14 +198,16 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("Valor: "); if (double.TryParse(Console.ReadLine(), out double v)) p.Value = v;
                         Console.Write("Descrição: "); p.Description = Console.ReadLine() ?? "";
                         Console.Write("URL Img: "); p.UrlImg = Console.ReadLine() ?? "";
-                        Console.Write("ID Empresa: "); if (int.TryParse(Console.ReadLine(), out int cid)) p.CompanyId = cid;
+                        Console.Write("ID Empresa: "); 
+                        if (int.TryParse(Console.ReadLine(), out int cid)) 
+                            p.Company = new Company { Id = cid };
                         await p.InserirAsync();
                         Console.WriteLine($"Produto cadastrado ID {p.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
                         var prods = await Product.BuscarTodosAsync();
                         foreach (var prod in prods)
-                            Console.WriteLine($"ID: {prod.Id} | Nome: {prod.Name} | Valor: {prod.Value} | EmpresaID: {prod.CompanyId}");
+                            Console.WriteLine($"ID: {prod.Id} | Nome: {prod.Name} | Valor: {prod.Value} | Empresa: {prod.Company?.Name}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
                         break;
                     case "3":
@@ -254,15 +258,18 @@ namespace Backend_Uc12_FiadoFacil
                         Console.Write("Método: "); p.Method = Console.ReadLine() ?? "";
                         Console.Write("ToDate (dd/mm/aaaa): "); if (DateTime.TryParse(Console.ReadLine(), out DateTime td)) p.ToDate = td;
                         Console.Write("DueDate (dd/mm/aaaa): "); if (DateTime.TryParse(Console.ReadLine(), out DateTime dd)) p.DueDate = dd;
-                        Console.Write("ID Usuário: "); if (int.TryParse(Console.ReadLine(), out int uid)) p.UserId = uid;
-                        Console.Write("ID Empresa: "); if (int.TryParse(Console.ReadLine(), out int cid)) p.CompanyId = cid;
+                        Console.Write("ID Usuário: "); 
+                        if (int.TryParse(Console.ReadLine(), out int uid)) p.User = new User { Id = uid };
+                        Console.Write("ID Empresa: "); 
+                        if (int.TryParse(Console.ReadLine(), out int cid)) p.Company = new Company { Id = cid };
+                        
                         await p.InserirAsync();
                         Console.WriteLine($"Cadastrado ID {p.Id}. Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
                         var pays = await Payment.BuscarTodosAsync();
                         foreach (var pay in pays)
-                            Console.WriteLine($"ID: {pay.Id} | Valor: {pay.Value} | Método: {pay.Method}");
+                            Console.WriteLine($"ID: {pay.Id} | Valor: {pay.Value} | Usuário: {pay.User?.Name} | Empresa: {pay.Company?.Name}");
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
                         break;
                     case "3":
@@ -292,15 +299,18 @@ namespace Backend_Uc12_FiadoFacil
                 switch (op)
                 {
                     case "1":
-                        Console.Write("ID Pagamento: "); int payId; int.TryParse(Console.ReadLine(), out payId);
-                        Console.Write("ID Produto: "); int prodId; int.TryParse(Console.ReadLine(), out prodId);
-                        await ProductPayment.InserirAsync(prodId, payId);
+                        Console.Write("ID Pagamento: "); int.TryParse(Console.ReadLine(), out int payId);
+                        Console.Write("ID Produto: "); int.TryParse(Console.ReadLine(), out int prodId);
+                        await ProductPayment.InserirAsync(new Product { Id = prodId }, new Payment { Id = payId });
                         Console.WriteLine("Vinculado! Pressione algo..."); Console.ReadKey();
                         break;
                     case "2":
-                        Console.Write("ID Pagamento: "); int pId; int.TryParse(Console.ReadLine(), out pId);
-                        var ids = await ProductPayment.BuscarProdutosPorPagamentoAsync(pId);
-                        Console.WriteLine($"Produtos vinculados ao pagamento {pId}: " + string.Join(", ", ids));
+                        Console.Write("ID Pagamento: "); int.TryParse(Console.ReadLine(), out int pId);
+                        var prods = await ProductPayment.BuscarProdutosPorPagamentoAsync(pId);
+                        Console.WriteLine($"Produtos vinculados ao pagamento {pId}:");
+                        foreach(var pr in prods) {
+                             Console.WriteLine($" - ID {pr.Id}: {pr.Name} (Valor: {pr.Value})");
+                        }
                         Console.WriteLine("Pressione algo..."); Console.ReadKey();
                         break;
                     case "0": return;

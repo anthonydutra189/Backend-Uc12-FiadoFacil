@@ -12,8 +12,8 @@ namespace Backend_Uc12_FiadoFacil
         public string Method { get; set; } = string.Empty;
         public DateTime ToDate { get; set; }
         public DateTime DueDate { get; set; }
-        public int UserId { get; set; }
-        public int CompanyId { get; set; }
+        public User User { get; set; }
+        public Company Company { get; set; }
 
         public const string Tabela = "payments";
 
@@ -23,14 +23,14 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"INSERT INTO {Tabela} (value, method, toDate, dueDate, userId, companyId) VALUES (@value, @method, @toDate, @dueDate, @userId, @companyId)";
+            string query = $"INSERT INTO {Tabela} (value, method, to_date, due_date, user_id, company_id) VALUES (@value, @method, @toDate, @dueDate, @userId, @companyId)";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@value", Value);
             command.Parameters.AddWithValue("@method", Method);
             command.Parameters.AddWithValue("@toDate", ToDate);
             command.Parameters.AddWithValue("@dueDate", DueDate);
-            command.Parameters.AddWithValue("@userId", UserId);
-            command.Parameters.AddWithValue("@companyId", CompanyId);
+            command.Parameters.AddWithValue("@userId", User?.Id);
+            command.Parameters.AddWithValue("@companyId", Company?.Id);
             await command.ExecuteNonQueryAsync();
             Id = (int)command.LastInsertedId;
         }
@@ -40,7 +40,11 @@ namespace Backend_Uc12_FiadoFacil
             var payments = new List<Payment>();
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"SELECT id, value, method, toDate, dueDate, userId, companyId FROM {Tabela}";
+            string query = $@"
+                SELECT p.*, u.name AS user_name, c.name AS company_name 
+                FROM {Tabela} p
+                INNER JOIN users u ON p.user_id = u.id
+                INNER JOIN companies c ON p.company_id = c.id";
             using var command = new MySqlCommand(query, connection);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -50,10 +54,10 @@ namespace Backend_Uc12_FiadoFacil
                     Id = reader.GetInt32("id"),
                     Value = reader.GetDouble("value"),
                     Method = reader.GetString("method"),
-                    ToDate = reader.GetDateTime("toDate"),
-                    DueDate = reader.GetDateTime("dueDate"),
-                    UserId = reader.GetInt32("userId"),
-                    CompanyId = reader.GetInt32("companyId")
+                    ToDate = reader.GetDateTime("to_date"),
+                    DueDate = reader.GetDateTime("due_date"),
+                    User = new User { Id = reader.GetInt32("user_id"), Name = reader.GetString("user_name") },
+                    Company = new Company { Id = reader.GetInt32("company_id"), Name = reader.GetString("company_name") }
                 });
             }
             return payments;

@@ -13,7 +13,7 @@ namespace Backend_Uc12_FiadoFacil
         public double Value { get; set; }
         public string Description { get; set; } = string.Empty;
         public string UrlImg { get; set; } = string.Empty;
-        public int CompanyId { get; set; }
+        public Company Company { get; set; }
 
         public const string Tabela = "products";
 
@@ -23,14 +23,14 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"INSERT INTO {Tabela} (name, type, value, description, urlImg, companyId) VALUES (@name, @type, @value, @description, @urlImg, @companyId)";
+            string query = $"INSERT INTO {Tabela} (name, type, value, description, url_img, company_id) VALUES (@name, @type, @value, @description, @urlImg, @companyId)";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@name", Name);
             command.Parameters.AddWithValue("@type", Type);
             command.Parameters.AddWithValue("@value", Value);
             command.Parameters.AddWithValue("@description", Description);
             command.Parameters.AddWithValue("@urlImg", UrlImg);
-            command.Parameters.AddWithValue("@companyId", CompanyId);
+            command.Parameters.AddWithValue("@companyId", Company?.Id);
             await command.ExecuteNonQueryAsync();
             Id = (int)command.LastInsertedId;
         }
@@ -40,7 +40,10 @@ namespace Backend_Uc12_FiadoFacil
             var products = new List<Product>();
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"SELECT id, name, type, value, description, urlImg, companyId FROM {Tabela}";
+            string query = $@"
+                SELECT p.*, c.name AS company_name 
+                FROM {Tabela} p
+                INNER JOIN companies c ON p.company_id = c.id";
             using var command = new MySqlCommand(query, connection);
             using var reader = await command.ExecuteReaderAsync();
             while (await reader.ReadAsync())
@@ -52,8 +55,12 @@ namespace Backend_Uc12_FiadoFacil
                     Type = reader.GetString("type"),
                     Value = reader.GetDouble("value"),
                     Description = reader.GetString("description"),
-                    UrlImg = reader.GetString("urlImg"),
-                    CompanyId = reader.GetInt32("companyId")
+                    UrlImg = reader.GetString("url_img"),
+                    Company = new Company 
+                    { 
+                        Id = reader.GetInt32("company_id"),
+                        Name = reader.GetString("company_name")
+                    }
                 });
             }
             return products;
@@ -63,7 +70,11 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"SELECT id, name, type, value, description, urlImg, companyId FROM {Tabela} WHERE id = @id";
+            string query = $@"
+                SELECT p.*, c.name AS company_name 
+                FROM {Tabela} p
+                INNER JOIN companies c ON p.company_id = c.id 
+                WHERE p.id = @id";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@id", id);
             using var reader = await command.ExecuteReaderAsync();
@@ -76,8 +87,12 @@ namespace Backend_Uc12_FiadoFacil
                     Type = reader.GetString("type"),
                     Value = reader.GetDouble("value"),
                     Description = reader.GetString("description"),
-                    UrlImg = reader.GetString("urlImg"),
-                    CompanyId = reader.GetInt32("companyId")
+                    UrlImg = reader.GetString("url_img"),
+                    Company = new Company 
+                    { 
+                        Id = reader.GetInt32("company_id"),
+                        Name = reader.GetString("company_name")
+                    }
                 };
             }
             return null;
@@ -87,14 +102,14 @@ namespace Backend_Uc12_FiadoFacil
         {
             using var connection = new MySqlConnection(ConfiguracaoBD.connectionString);
             await connection.OpenAsync();
-            string query = $"UPDATE {Tabela} SET name = @name, type = @type, value = @value, description = @description, urlImg = @urlImg, companyId = @companyId WHERE id = @id";
+            string query = $"UPDATE {Tabela} SET name = @name, type = @type, value = @value, description = @description, url_img = @urlImg, company_id = @companyId WHERE id = @id";
             using var command = new MySqlCommand(query, connection);
             command.Parameters.AddWithValue("@name", Name);
             command.Parameters.AddWithValue("@type", Type);
             command.Parameters.AddWithValue("@value", Value);
             command.Parameters.AddWithValue("@description", Description);
             command.Parameters.AddWithValue("@urlImg", UrlImg);
-            command.Parameters.AddWithValue("@companyId", CompanyId);
+            command.Parameters.AddWithValue("@companyId", Company?.Id);
             command.Parameters.AddWithValue("@id", Id);
             await command.ExecuteNonQueryAsync();
         }
