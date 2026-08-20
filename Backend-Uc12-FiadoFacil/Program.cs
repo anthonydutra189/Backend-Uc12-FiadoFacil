@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+
+Console.WriteLine("Criando uma API ");
 namespace Backend_Uc12_FiadoFacil
 {
     class Program
