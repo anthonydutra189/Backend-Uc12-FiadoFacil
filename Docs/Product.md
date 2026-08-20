@@ -19,6 +19,5 @@ CREATE TABLE `products` ()
         PRIMARY KEY (`id`),
         KEY `products_company_id_fkey` (`company_id`),
         CONSTRAINT `products_company_id_fkey` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON UPDATE CASCADE
-        ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 
 ## FILTROS
