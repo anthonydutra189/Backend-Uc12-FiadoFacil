@@ -1,6 +1,10 @@
+using Backend_Uc12_FiadoFacil;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+API api = new API();
+await api.Iniciar();
 
 namespace Backend_Uc12_FiadoFacil
 {

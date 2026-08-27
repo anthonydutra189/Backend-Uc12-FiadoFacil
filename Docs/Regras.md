@@ -7,7 +7,7 @@
             -  Product:
             -  Payment:
             -  User: Pode criar todos os tipo de usuários: Admin, Comerciante e cliente 
-                - somente o admin pode criar outros u
+                - somente o admin pode criar outros admin 
         
         -  Comerciante 
             - Company:
